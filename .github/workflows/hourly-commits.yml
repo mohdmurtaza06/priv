@@ -19,16 +19,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Configure git and make 3 commits
+      - name: Configure git and make 3-5 commits
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Create or update activity log with 3 sequential commits
-          for i in 1 2 3; do
+          # Random number of commits between 3 and 5
+          NUM_COMMITS=$((3 + RANDOM % 3))
+          echo "Making $NUM_COMMITS commits this hour"
+          
+          for i in $(seq 1 $NUM_COMMITS); do
             TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
             echo "[$TIMESTAMP] Hourly update #$i" >> activity.log
             git add activity.log
             git commit -m "chore: hourly activity update $i ($TIMESTAMP)"
             git push origin HEAD:main
+            # Small delay to make timestamps distinct
+            sleep 1
           done
